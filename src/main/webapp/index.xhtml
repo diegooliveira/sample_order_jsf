@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+    <ui:composition template="templates/template.xhtml">
+        <ui:define name="body">
+            <h:form prependId="false">
+                <p:panel>
+                    <f:facet name="header">
+                        <h:outputText value="Ações" />
+                    </f:facet>
+                    <p:commandButton value="Fechar Pedido" tabindex="1"/>
+                    <p:commandButton value="Imprimir Orçamento" tabindex="2"/>
+                    <p:commandButton value="Adicionar Produtos" onclick="addProductDialog.show();" type="button"  tabindex="3"/>
+                </p:panel>
+                <p:dialog modal="true" header="Adição de Produtos" widgetVar="addProductDialog" >
+                    <p:focus id="productFocus" for="productSearch" />
+                    <h:panelGrid columns="2">
+                        <f:facet name="header">
+                            <h:outputText value="Selecione o Produto" />
+                        </f:facet>
+                        <h:outputText value="Produto" />
+                        <p:autoComplete id="productSearch" completeMethod="#{orderController.listProducts}"
+                                        value="#{orderController.product}"  tabindex="4" required="true"
+                                           var="prod" itemValue="#{prod}" itemLabel="#{prod.name}" >
+                            <p:ajax event="itemSelect" update="price" />
+                        </p:autoComplete>
+                        <h:outputText value="Preço" />
+                        <h:inputText id="price" readonly="true" disabled="true" value="#{orderController.product.price}" >
+                            <f:convertNumber type="currency" currencySymbol="R$" />
+                        </h:inputText>
+                        <h:outputText value="Quantidade"/>
+                        <h:inputText id="quantityField" value="#{orderController.productQuantity}"  tabindex="5" required="true"/>
+                        <f:facet name="footer">
+                            <p:commandButton id="btnAdd" value="Adicionar" ajax="true" 
+                                             actionListener="#{orderController.addItemToOrder}" 
+                                             update="quantityField, productList, price, productSearch, productFocus"  tabindex="6" />
+                            <p:commandButton value="Calcelar" onclick="addProductDialog.hide();" tabindex="7"/>
+                        </f:facet>
+                    </h:panelGrid>
+                </p:dialog> 
+                <p:panel>
+                    <f:facet name="header">
+                        <h:outputText value="Lista de produtos" />
+                    </f:facet>
+                    <p:dataTable id="productList" value="#{orderController.order.items}" var="item" >
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Código" />
+                            </f:facet>
+                            <h:outputText value="#{item.product.id}" />
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Nome" />
+                            </f:facet>
+                            <h:outputText value="#{item.product.name}" />
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Valor" />
+                            </f:facet>
+                            <h:outputText value="#{item.product.price}" >
+                                <f:convertNumber type="currency" currencySymbol="R$"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Quantidade" />
+                            </f:facet>
+                            <h:outputText value="#{item.quantity}" />
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Total" />
+                            </f:facet>
+                            <h:outputText value="#{item.total}" >
+                                <f:convertNumber type="currency" currencySymbol="R$"/>
+                            </h:outputText>
+                        </p:column>
+                    </p:dataTable>
+                </p:panel>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+
+</html>
+
